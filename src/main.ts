@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import 'unfetch/polyfill'
+import 'isomorphic-fetch';
 import {createChatGPTAPI} from './chatgpt-api'
 import {runPRReview} from './mode/pr_review'
 import {readFileSync} from 'fs'
