@@ -16,6 +16,9 @@ on:
       - '**.md'
   workflow_dispatch:
 
+env:
+  NODE_OPTIONS: --openssl-legacy-provider
+  
 jobs:
   check-dist:
     runs-on: ubuntu-latest
