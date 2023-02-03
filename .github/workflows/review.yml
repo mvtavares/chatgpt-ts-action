@@ -1,0 +1,17 @@
+on: [pull_request]
+
+name: ChatGPT CodeReview
+
+jobs:
+  chatgpt_comment:
+    runs-on: ubuntu-latest
+    name: Let ChatGPT comment on your PR.
+    steps:
+      - name: ChatGPT comment
+        uses: ./
+        id: chatgpt
+        with:
+          mode: 'pr'  # Use true to enable the unstable split feature.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

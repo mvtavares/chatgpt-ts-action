@@ -2,10 +2,9 @@
   <a href="https://github.com/mvtavares/chatgpt-ts-action/actions"><img alt="chatgpt-ts-action status" src="https://github.com/mvtavares/chatgpt-ts-action/workflows/build-test/badge.svg"></a>
 </p>
 
-# chatgpt-action - Fork of the https://github.com/kxxt/chatgpt-action/ action to Typescript
+# chatgpt-ts-action
 
-Let chatgpt review your PR.
-
+Let ChatGPT review your PR. This is a TypeScript fork of the https://github.com/kxxt/chatgpt-action/ action
 
 ## Showcase
 
@@ -30,13 +29,11 @@ jobs:
         uses: mvtavares/chatgpt-action@v0.1
         id: chatgpt
         with:
-          number: ${{ github.event.pull_request.number }}
-          sessionToken: ${{ secrets.CHATGPT_SESSION_TOKEN }}
-          split: 'yolo'  # Use true to enable the unstable split feature.
+          mode: 'pr'  
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 ```
-
 
 ## Publish to a distribution branch
 

@@ -5,9 +5,6 @@ branding:
   color: green
 
 inputs:
-  sessionToken:
-    description: "Your ChatGPT session token."
-    required: true
   mode:
     description: "Mode"
     required: true
