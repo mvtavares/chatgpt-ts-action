@@ -26,14 +26,15 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mvtavares/chatgpt-ts-action/issues"
-   },
-   "homepage": "https://github.com/mvtavares/chatgpt-ts-action/#readme",
+  },
+  "homepage": "https://github.com/mvtavares/chatgpt-ts-action/#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
     "@octokit/action": "^5.0.2",
     "chatgpt": "^4.1.1",
-    "node-fetch": "^3.3.0"
+    "node-fetch": "^3.3.0",
+    "unfetch": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.18",

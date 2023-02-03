@@ -1,9 +1,8 @@
 import * as core from '@actions/core'
+import 'unfetch/polyfill'
 import {createChatGPTAPI} from './chatgpt-api'
 import {runPRReview} from './mode/pr_review'
 import {readFileSync} from 'fs'
-
-const nodeFetch = require('node-fetch') as typeof fetch;
 
 async function run(): Promise<void> {
   try {
@@ -35,5 +34,4 @@ async function run(): Promise<void> {
   }
 }
 
-globalThis.fetch = nodeFetch
 run()
