@@ -1,10 +1,12 @@
 import * as core from '@actions/core'
+import 'isomorphic-fetch';
 import {createChatGPTAPI} from './chatgpt-api'
 import {runPRReview} from './mode/pr_review'
 import {readFileSync} from 'fs'
 
 async function run(): Promise<void> {
   try {
+
     const ev = JSON.parse(
       readFileSync(`${process.env.GITHUB_EVENT_PATH}`, 'utf8')
     )
@@ -31,5 +33,4 @@ async function run(): Promise<void> {
     core.setFailed(error.message)
   }
 }
-
 run()
