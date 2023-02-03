@@ -1,11 +1,21 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: "ChatGPT Integration"
+description: "This action integrates ChatGPT into your CI."
+branding:
+  icon: activity
+  color: green
+
 inputs:
-  milliseconds: # change this
+  sessionToken:
+    description: "Your ChatGPT session token."
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  mode:
+    description: "Mode"
+    required: true
+    default: "pr"
+
+outputs:
+  comment:
+    description: "The comment from chatgpt."
 runs:
-  using: 'node16'
+  using: 'node18'
   main: 'dist/index.js'

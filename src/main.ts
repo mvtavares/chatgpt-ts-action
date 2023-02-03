@@ -1,19 +1,35 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import { createChatGPTAPI } from "./chatgpt";
+import { runPRReview } from "./mode/pr_review";
+import { readFileSync } from 'fs';
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const ev = JSON.parse(
+      readFileSync(`${process.env.GITHUB_EVENT_PATH}`, 'utf8')
+    )
+    const prNum = ev.pull_request.number
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const mode = core.getInput("mode");
+    const split = "yolo"
+    // Get current repo.
+    const [owner, repo] = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split("/") : [];
 
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message)
+    // Create ChatGPT API
+    const api = await createChatGPTAPI();
+
+    if (mode == "pr") {
+      runPRReview({ api, owner, repo, pull_number: prNum, split });
+    } else if (mode == "issue") {
+      throw "Not implemented!";
+    } else {
+      throw `Invalid mode ${mode}`;
+    }
+  } catch (error: any) {
+    core.setFailed(error.message);
   }
 }
+
+
 
 run()
