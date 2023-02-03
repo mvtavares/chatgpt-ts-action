@@ -1,7 +1,7 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 5103:
+/***/ 8697:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -46,7 +46,7 @@ function createChatGPTAPI() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const api = new chatgpt_1.ChatGPTAPI({
-            apiKey: (_a = process.env.OPENAI_API_KEY) !== null && _a !== void 0 ? _a : "",
+            apiKey: (_a = process.env.OPENAI_API_KEY) !== null && _a !== void 0 ? _a : '',
             debug: true
         });
         return api;
@@ -54,7 +54,7 @@ function createChatGPTAPI() {
 }
 exports.createChatGPTAPI = createChatGPTAPI;
 function is503or504Error(err) {
-    return err.message.includes("503") || err.message.includes("504");
+    return err.message.includes('503') || err.message.includes('504');
 }
 function callChatGPT(api, content, retryOn503) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -72,27 +72,30 @@ function callChatGPT(api, content, retryOn503) {
     });
 }
 exports.callChatGPT = callChatGPT;
-function startConversation(api, res, retryOn503) {
+function startConversation(api, retryOn503) {
     return {
-        res,
+        api,
         retryOn503,
-        sendMessage(message) {
+        sendMessage(message, res) {
             return __awaiter(this, void 0, void 0, function* () {
                 let cnt = 0;
                 while (cnt++ <= retryOn503) {
                     try {
-                        const response = yield api.sendMessage(message, { conversationId: res.conversationId, parentMessageId: res.id });
+                        const response = yield api.sendMessage(message, {
+                            conversationId: (res === null || res === void 0 ? void 0 : res.conversationId) || undefined,
+                            parentMessageId: (res === null || res === void 0 ? void 0 : res.id) || undefined
+                        });
                         return response;
                     }
                     catch (err) {
                         if (!is503or504Error(err))
                             throw err;
                         core.warning(`got "${err}", sleep for 10s now!`);
-                        yield new Promise((r) => setTimeout(r, 10000));
+                        yield new Promise(r => setTimeout(r, 10000));
                     }
                 }
             });
-        },
+        }
     };
 }
 exports.startConversation = startConversation;
@@ -139,7 +142,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const chatgpt_1 = __nccwpck_require__(5103);
+const chatgpt_api_1 = __nccwpck_require__(8697);
 const pr_review_1 = __nccwpck_require__(8034);
 const fs_1 = __nccwpck_require__(5747);
 function run() {
@@ -147,17 +150,19 @@ function run() {
         try {
             const ev = JSON.parse((0, fs_1.readFileSync)(`${process.env.GITHUB_EVENT_PATH}`, 'utf8'));
             const prNum = ev.pull_request.number;
-            const mode = core.getInput("mode");
-            const split = "yolo";
+            const mode = core.getInput('mode');
+            const split = 'yolo';
             // Get current repo.
-            const [owner, repo] = process.env.GITHUB_REPOSITORY ? process.env.GITHUB_REPOSITORY.split("/") : [];
+            const [owner, repo] = process.env.GITHUB_REPOSITORY
+                ? process.env.GITHUB_REPOSITORY.split('/')
+                : [];
             // Create ChatGPT API
-            const api = yield (0, chatgpt_1.createChatGPTAPI)();
-            if (mode == "pr") {
-                (0, pr_review_1.runPRReview)({ api, owner, repo, pull_number: prNum, split });
+            const api = yield (0, chatgpt_api_1.createChatGPTAPI)();
+            if (mode == 'pr') {
+                (0, pr_review_1.runPRReview)(api, owner, repo, prNum, split);
             }
-            else if (mode == "issue") {
-                throw "Not implemented!";
+            else if (mode == 'issue') {
+                throw 'Not implemented!';
             }
             else {
                 throw `Invalid mode ${mode}`;
@@ -214,38 +219,53 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runPRReview = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const prompt_1 = __nccwpck_require__(2063);
-const chatgpt_1 = __nccwpck_require__(5103);
+const chatgpt_api_1 = __nccwpck_require__(8697);
 const action_1 = __nccwpck_require__(1231);
 const github = __importStar(__nccwpck_require__(5438));
 const octokit = new action_1.Octokit();
 const context = github.context;
-function runPRReview({ api, owner, repo, pull_number, split }) {
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+function runPRReview(api, owner, repo, pull_number, split) {
     return __awaiter(this, void 0, void 0, function* () {
         const { data: { title, body } } = yield octokit.pulls.get({
             owner,
             repo,
-            pull_number,
+            pull_number
         });
         const { data: diff } = yield octokit.rest.pulls.get({
             owner,
             repo,
             pull_number,
             mediaType: {
-                format: "diff",
-            },
+                format: 'diff'
+            }
         });
         let reply;
-        if (split === "yolo") {
+        if (split === 'yolo') {
             // check this line
-            const prompt = (0, prompt_1.genReviewPRPrompt)(title, body !== null && body !== void 0 ? body : "", JSON.stringify(diff));
+            const prompt = (0, prompt_1.genReviewPRPrompt)(title, body !== null && body !== void 0 ? body : '', JSON.stringify(diff));
             core.info(`The prompt is: ${prompt}`);
-            const response = yield (0, chatgpt_1.callChatGPT)(api, prompt, 5);
+            const response = yield (0, chatgpt_api_1.callChatGPT)(api, prompt, 5);
             reply = response;
         }
         else {
-            throw "Not implemented!";
+            reply = '';
+            const { welcomePrompts, diffPrompts, endPrompt } = (0, prompt_1.genReviewPRSplitedPrompt)(title, body !== null && body !== void 0 ? body : '', JSON.stringify(diff), 65536);
+            const conversation = (0, chatgpt_api_1.startConversation)(api, 5);
+            let cnt = 0;
+            const prompts = welcomePrompts.concat(diffPrompts);
+            prompts.push(endPrompt);
+            let response = null;
+            for (const prompt of prompts) {
+                core.info(`Sending ${prompt}`);
+                response = yield conversation.sendMessage(prompt, response);
+                core.info(`Received ${response}`);
+                reply += `**ChatGPT#${++cnt}**: ${response}\n\n`;
+                // Wait for 10s
+                yield new Promise(r => setTimeout(r, 10000));
+            }
+            yield octokit.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pull_number, body: reply }));
         }
-        yield octokit.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pull_number, body: reply }));
     });
 }
 exports.runPRReview = runPRReview;
@@ -278,8 +298,8 @@ function genReviewPRSplitedPrompt(title, body, diff, limit) {
         if (i % 2 == 1) {
             let dif = prev + cur;
             if (dif.length > limit) {
-                const header = diff.split("\n", 1)[0];
-                const info = "This diff is too large so I omitted it for you.";
+                const header = diff.split('\n', 1)[0];
+                const info = 'This diff is too large so I omitted it for you.';
                 splits.push(`${header}\n${info}`);
             }
             else
@@ -294,10 +314,10 @@ function genReviewPRSplitedPrompt(title, body, diff, limit) {
   The remaining part is the body.
   ${body}`,
             `Now I will give you the changes made in this PR one file at a time.
-  When a diff is too large, I will omit it and tell you about that.`,
+  When a diff is too large, I will omit it and tell you about that.`
         ],
         diffPrompts: splits,
-        endPrompt: `Based on your existing knowledge, can you tell me the problems with the above pull request and your suggestions for this PR?`,
+        endPrompt: `Based on your existing knowledge, can you tell me the problems with the above pull request and your suggestions for this PR?`
     };
 }
 exports.genReviewPRSplitedPrompt = genReviewPRSplitedPrompt;
