@@ -2,9 +2,12 @@ import * as core from '@actions/core'
 import {createChatGPTAPI} from './chatgpt-api'
 import {runPRReview} from './mode/pr_review'
 import {readFileSync} from 'fs'
+const nodeFetch = require('node-fetch') as typeof fetch
 
 async function run(): Promise<void> {
   try {
+    // quick dirty fix due node 18 dependency from chatgpt lib
+    globalThis.fetch = nodeFetch
     const ev = JSON.parse(
       readFileSync(`${process.env.GITHUB_EVENT_PATH}`, 'utf8')
     )
