@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import {createChatGPTAPI} from './chatgpt-api'
 import {runPRReview} from './mode/pr_review'
 import {readFileSync} from 'fs'
+
 const nodeFetch = require('node-fetch') as typeof fetch;
 
 async function run(): Promise<void> {
@@ -34,6 +35,5 @@ async function run(): Promise<void> {
   }
 }
 
-globalThis.fetch = fetch
+globalThis.fetch = nodeFetch
 run()
-
