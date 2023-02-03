@@ -33,7 +33,6 @@
     "@actions/github": "^5.1.1",
     "@octokit/action": "^5.0.2",
     "chatgpt": "^4.1.1",
-    "node-fetch": "^3.3.0",
     "unfetch": "^5.0.0"
   },
   "devDependencies": {

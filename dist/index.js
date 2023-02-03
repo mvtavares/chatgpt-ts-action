@@ -142,10 +142,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
+__nccwpck_require__(8543);
 const chatgpt_api_1 = __nccwpck_require__(8697);
 const pr_review_1 = __nccwpck_require__(8034);
 const fs_1 = __nccwpck_require__(7147);
-__nccwpck_require__(8543);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
