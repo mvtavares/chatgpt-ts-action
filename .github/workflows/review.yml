@@ -5,7 +5,9 @@ on:
       - 'dist/**'
 
 name: ChatGPT CodeReview
-
+env:
+  ACTIONS_RUNNER_DEBUG: true
+  
 jobs:
   chatgpt_comment:
     #if: contains(github.event.pull_request.requested_reviewers.*.login, 'mvtavares')

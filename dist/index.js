@@ -234,7 +234,7 @@ const MAX_BODY_LENGTH = 500;
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 function runPRReview(api, owner, repo, pull_number, split) {
     return __awaiter(this, void 0, void 0, function* () {
-        let { data: { title, body } } = yield octokit.pulls.get({
+        const { data: { title, body } } = yield octokit.pulls.get({
             owner,
             repo,
             pull_number
@@ -251,12 +251,13 @@ function runPRReview(api, owner, repo, pull_number, split) {
         if (split === 'yolo') {
             core.debug(`Diff is: ${diff}`);
             // check this line
+            let promptBody = body;
             if (body && body.length > MAX_BODY_LENGTH) {
-                body = utils.truncate(body, MAX_BODY_LENGTH);
+                promptBody = utils.truncate(body, MAX_BODY_LENGTH);
             }
             core.debug(`title length: ${title.length}`);
-            core.debug(`body length: ${body === null || body === void 0 ? void 0 : body.length}`);
-            const prompt = (0, prompt_1.genReviewPRPrompt)(title, body !== null && body !== void 0 ? body : '', String(diff));
+            core.debug(`body length: ${promptBody === null || promptBody === void 0 ? void 0 : promptBody.length}`);
+            const prompt = (0, prompt_1.genReviewPRPrompt)(title, promptBody !== null && promptBody !== void 0 ? promptBody : '', String(diff));
             core.info(`The prompt is: ${prompt}`);
             core.debug(`prompt length: ${title.length}`);
             const response = yield (0, chatgpt_api_1.callChatGPT)(api, prompt, 5);
@@ -350,10 +351,9 @@ exports.genReviewPRSplitedPrompt = genReviewPRSplitedPrompt;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.truncate = void 0;
 function truncate(str, n) {
-    return (str.length > n) ? str.slice(0, n - 1) + '&hellip;' : str;
+    return str.length > n ? `${str.slice(0, n - 1)}&hellip;` : str;
 }
 exports.truncate = truncate;
-;
 
 
 /***/ }),
