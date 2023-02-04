@@ -3,9 +3,11 @@ import {genReviewPRPrompt, genReviewPRSplitedPrompt} from '../prompt'
 import {callChatGPT, startConversation} from '../chatgpt-api'
 import {Octokit} from '@octokit/action'
 import * as github from '@actions/github'
+import * as utils from '../utils/string-utils'
 
 const octokit = new Octokit()
 const context = github.context
+const MAX_BODY_LENGTH = 500
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export async function runPRReview(
@@ -15,7 +17,7 @@ export async function runPRReview(
   pull_number: number,
   split: string
 ): Promise<void> {
-  const {
+  let {
     data: {title, body}
   } = await octokit.pulls.get({
     owner,
@@ -32,19 +34,31 @@ export async function runPRReview(
   })
   let reply: string
   if (split === 'yolo') {
+    core.debug(`Diff is: ${diff}`)
     // check this line
-    const prompt = genReviewPRPrompt(title, body ?? '', JSON.stringify(diff))
+    if (body && body.length > MAX_BODY_LENGTH) {
+      body = utils.truncate(body, MAX_BODY_LENGTH)
+    }
+    core.debug(`title length: ${title.length}`)
+    core.debug(`body length: ${body?.length}`)
+    const prompt = genReviewPRPrompt(title, body ?? '', String(diff))
     core.info(`The prompt is: ${prompt}`)
+    core.debug(`prompt length: ${title.length}`)
+
     const response = await callChatGPT(api, prompt, 5)
-    reply = response
+    reply = response.text
   } else {
     reply = ''
     const {welcomePrompts, diffPrompts, endPrompt} = genReviewPRSplitedPrompt(
       title,
       body ?? '',
-      JSON.stringify(diff),
+      String(diff),
       65536
     )
+    core.debug(`title length: ${title.length}`)
+    core.debug(`body length: ${body?.length}`)
+    core.debug(`diff length: ${title.length}`)
+
     const conversation = startConversation(api, 5)
     let cnt = 0
     const prompts = welcomePrompts.concat(diffPrompts)
@@ -54,14 +68,14 @@ export async function runPRReview(
       core.info(`Sending ${prompt}`)
       response = await conversation.sendMessage(prompt, response)
       core.info(`Received ${response}`)
-      reply += `**ChatGPT#${++cnt}**: ${response}\n\n`
+      reply += `**ChatGPT#${++cnt}**: ${response.text}\n\n`
       // Wait for 10s
       await new Promise(r => setTimeout(r, 10000))
     }
-    await octokit.issues.createComment({
-      ...context.repo,
-      issue_number: pull_number,
-      body: reply
-    })
   }
+  await octokit.issues.createComment({
+    ...context.repo,
+    issue_number: pull_number,
+    body: reply
+  })
 }
