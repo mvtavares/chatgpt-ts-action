@@ -6,13 +6,16 @@ import {readFileSync} from 'fs'
 
 async function run(): Promise<void> {
   try {
-
+    core.debug("Initializando...")
     const ev = JSON.parse(
       readFileSync(`${process.env.GITHUB_EVENT_PATH}`, 'utf8')
     )
     const prNum = ev.pull_request.number
+    core.debug(`PR number is: ${prNum}`)
 
     const mode = core.getInput('mode')
+    core.debug(`Running mode: ${mode}`)
+
     const split = 'yolo'
     // Get current repo.
     const [owner, repo] = process.env.GITHUB_REPOSITORY

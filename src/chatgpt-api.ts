@@ -1,6 +1,8 @@
 import {ChatGPTAPI, ChatMessage} from 'chatgpt'
 import * as core from '@actions/core'
 
+export const MODEL_MAX_LENGTH = 4097;
+
 export async function createChatGPTAPI(): Promise<ChatGPTAPI> {
   const api = new ChatGPTAPI({
     apiKey: process.env.OPENAI_API_KEY ?? '',

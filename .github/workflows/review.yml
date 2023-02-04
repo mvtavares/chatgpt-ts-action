@@ -1,9 +1,16 @@
-on: [pull_request]
+on: 
+  pull_request:    
+    types: [ opened, review_requested, synchronize ]
+    paths-ignore:
+      - 'dist/**'
 
 name: ChatGPT CodeReview
-
+env:
+  ACTIONS_RUNNER_DEBUG: true
+  
 jobs:
   chatgpt_comment:
+    #if: contains(github.event.pull_request.requested_reviewers.*.login, 'mvtavares')
     runs-on: ubuntu-latest
     name: Let ChatGPT comment on your PR.
     steps:

@@ -39,9 +39,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.startConversation = exports.callChatGPT = exports.createChatGPTAPI = void 0;
+exports.startConversation = exports.callChatGPT = exports.createChatGPTAPI = exports.MODEL_MAX_LENGTH = void 0;
 const chatgpt_1 = __nccwpck_require__(2353);
 const core = __importStar(__nccwpck_require__(2186));
+exports.MODEL_MAX_LENGTH = 4097;
 function createChatGPTAPI() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -149,9 +150,12 @@ const fs_1 = __nccwpck_require__(7147);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            core.debug("Initializando...");
             const ev = JSON.parse((0, fs_1.readFileSync)(`${process.env.GITHUB_EVENT_PATH}`, 'utf8'));
             const prNum = ev.pull_request.number;
+            core.debug(`PR number is: ${prNum}`);
             const mode = core.getInput('mode');
+            core.debug(`Running mode: ${mode}`);
             const split = 'yolo';
             // Get current repo.
             const [owner, repo] = process.env.GITHUB_REPOSITORY
@@ -223,8 +227,10 @@ const prompt_1 = __nccwpck_require__(2063);
 const chatgpt_api_1 = __nccwpck_require__(8697);
 const action_1 = __nccwpck_require__(1231);
 const github = __importStar(__nccwpck_require__(5438));
+const utils = __importStar(__nccwpck_require__(8101));
 const octokit = new action_1.Octokit();
 const context = github.context;
+const MAX_BODY_LENGTH = 500;
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 function runPRReview(api, owner, repo, pull_number, split) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -243,15 +249,26 @@ function runPRReview(api, owner, repo, pull_number, split) {
         });
         let reply;
         if (split === 'yolo') {
+            core.debug(`Diff is: ${diff}`);
             // check this line
-            const prompt = (0, prompt_1.genReviewPRPrompt)(title, body !== null && body !== void 0 ? body : '', JSON.stringify(diff));
+            let promptBody = body;
+            if (body && body.length > MAX_BODY_LENGTH) {
+                promptBody = utils.truncate(body, MAX_BODY_LENGTH);
+            }
+            core.debug(`title length: ${title.length}`);
+            core.debug(`body length: ${promptBody === null || promptBody === void 0 ? void 0 : promptBody.length}`);
+            const prompt = (0, prompt_1.genReviewPRPrompt)(title, promptBody !== null && promptBody !== void 0 ? promptBody : '', String(diff));
             core.info(`The prompt is: ${prompt}`);
+            core.debug(`prompt length: ${title.length}`);
             const response = yield (0, chatgpt_api_1.callChatGPT)(api, prompt, 5);
-            reply = response;
+            reply = response.text;
         }
         else {
             reply = '';
-            const { welcomePrompts, diffPrompts, endPrompt } = (0, prompt_1.genReviewPRSplitedPrompt)(title, body !== null && body !== void 0 ? body : '', JSON.stringify(diff), 65536);
+            const { welcomePrompts, diffPrompts, endPrompt } = (0, prompt_1.genReviewPRSplitedPrompt)(title, body !== null && body !== void 0 ? body : '', String(diff), 65536);
+            core.debug(`title length: ${title.length}`);
+            core.debug(`body length: ${body === null || body === void 0 ? void 0 : body.length}`);
+            core.debug(`diff length: ${title.length}`);
             const conversation = (0, chatgpt_api_1.startConversation)(api, 5);
             let cnt = 0;
             const prompts = welcomePrompts.concat(diffPrompts);
@@ -261,12 +278,12 @@ function runPRReview(api, owner, repo, pull_number, split) {
                 core.info(`Sending ${prompt}`);
                 response = yield conversation.sendMessage(prompt, response);
                 core.info(`Received ${response}`);
-                reply += `**ChatGPT#${++cnt}**: ${response}\n\n`;
+                reply += `**ChatGPT#${++cnt}**: ${response.text}\n\n`;
                 // Wait for 10s
                 yield new Promise(r => setTimeout(r, 10000));
             }
-            yield octokit.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pull_number, body: reply }));
         }
+        yield octokit.issues.createComment(Object.assign(Object.assign({}, context.repo), { issue_number: pull_number, body: reply }));
     });
 }
 exports.runPRReview = runPRReview;
@@ -322,6 +339,21 @@ function genReviewPRSplitedPrompt(title, body, diff, limit) {
     };
 }
 exports.genReviewPRSplitedPrompt = genReviewPRSplitedPrompt;
+
+
+/***/ }),
+
+/***/ 8101:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.truncate = void 0;
+function truncate(str, n) {
+    return str.length > n ? `${str.slice(0, n - 1)}&hellip;` : str;
+}
+exports.truncate = truncate;
 
 
 /***/ }),
