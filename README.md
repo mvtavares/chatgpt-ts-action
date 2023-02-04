@@ -10,8 +10,8 @@ Let ChatGPT review your PR. This is a TypeScript fork of the https://github.com/
 
 ### Examples:
 
-- https://github.com/mvtavares/chatgpt-ts-action/pull/13
-- https://github.com/mvtavares/chatgpt-ts-action/pull/11 (commented by mvtavares, but from the integration)
+- [Improving README and a workflow file](https://github.com/mvtavares/chatgpt-ts-action/pull/13)
+- [Dependabot bump update](https://github.com/mvtavares/chatgpt-ts-action/pull/11) (commented by mvtavares, but from the integration)
 
 ## Usage
 
