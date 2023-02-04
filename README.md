@@ -22,14 +22,16 @@ name: ChatGPT CodeReview
 
 jobs:
   chatgpt_comment:
+    if: contains(github.event.pull_request.requested_reviewers.*.login, 'mvtavares')
     runs-on: ubuntu-latest
-    name: Let chatgpt comment on your PR.
+    name: Let ChatGPT comment on your PR.
     steps:
+      - uses: actions/checkout@v3
       - name: ChatGPT comment
-        uses: mvtavares/chatgpt-action@v0.1
+        uses: mvtavares/chatgpt-ts-action@v1
         id: chatgpt
         with:
-          mode: 'pr'  
+          mode: 'pr'  # Use true to enable the unstable split feature.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

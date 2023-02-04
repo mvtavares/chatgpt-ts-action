@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: ChatGPT comment
-        uses: ./
+        uses: mvtavares/chatgpt-ts-action@v1
         id: chatgpt
         with:
           mode: 'pr'  # Use true to enable the unstable split feature.
