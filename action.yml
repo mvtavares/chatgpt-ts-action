@@ -1,4 +1,4 @@
-name: "ChatGPT Integration"
+name: "ChatGPT Typescript Integration"
 description: "This action integrates ChatGPT into your CI."
 branding:
   icon: activity
