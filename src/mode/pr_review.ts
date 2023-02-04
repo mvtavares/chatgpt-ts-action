@@ -17,7 +17,7 @@ export async function runPRReview(
   pull_number: number,
   split: string
 ): Promise<void> {
-  let {
+  const {
     data: {title, body}
   } = await octokit.pulls.get({
     owner,
@@ -36,12 +36,13 @@ export async function runPRReview(
   if (split === 'yolo') {
     core.debug(`Diff is: ${diff}`)
     // check this line
+    let promptBody = body
     if (body && body.length > MAX_BODY_LENGTH) {
-      body = utils.truncate(body, MAX_BODY_LENGTH)
+      promptBody = utils.truncate(body, MAX_BODY_LENGTH)
     }
     core.debug(`title length: ${title.length}`)
-    core.debug(`body length: ${body?.length}`)
-    const prompt = genReviewPRPrompt(title, body ?? '', String(diff))
+    core.debug(`body length: ${promptBody?.length}`)
+    const prompt = genReviewPRPrompt(title, promptBody ?? '', String(diff))
     core.info(`The prompt is: ${prompt}`)
     core.debug(`prompt length: ${title.length}`)
 

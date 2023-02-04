@@ -8,7 +8,7 @@ name: ChatGPT CodeReview
 
 jobs:
   chatgpt_comment:
-    if: contains(github.event.pull_request.requested_reviewers.*.login, 'mvtavares')
+    #if: contains(github.event.pull_request.requested_reviewers.*.login, 'mvtavares')
     runs-on: ubuntu-latest
     name: Let ChatGPT comment on your PR.
     steps:
