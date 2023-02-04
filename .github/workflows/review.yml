@@ -7,7 +7,9 @@ on:
 name: ChatGPT CodeReview
 env:
   ACTIONS_RUNNER_DEBUG: true
-  
+
+permissions: write-all
+
 jobs:
   chatgpt_comment:
     #if: contains(github.event.pull_request.requested_reviewers.*.login, 'mvtavares')
@@ -16,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: ChatGPT comment
-        uses: ./
+        uses: mvtavares/chatgpt-ts-action@v1
         id: chatgpt
         with:
           mode: 'pr'  # Use true to enable the unstable split feature.
