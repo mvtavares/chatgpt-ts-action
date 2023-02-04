@@ -8,10 +8,10 @@ Let ChatGPT review your PR. This is a TypeScript fork of the https://github.com/
 
 ## Showcase
 
-### YOLO Mode: Give all the info to ChatGPT in one go
+### Examples:
 
-- https://github.com/kxxt/chatgpt-action/pull/12
-
+- https://github.com/mvtavares/chatgpt-ts-action/pull/13
+- https://github.com/mvtavares/chatgpt-ts-action/pull/11 (commented by mvtavares, but from the integration)
 
 ## Usage
 
