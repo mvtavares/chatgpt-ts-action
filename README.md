@@ -2,6 +2,7 @@
   <a href="https://github.com/mvtavares/chatgpt-ts-action/actions"><img alt="chatgpt-ts-action status" src="https://github.com/mvtavares/chatgpt-ts-action/workflows/build-test/badge.svg"></a>
 </p>
 
+
 # chatgpt-ts-action
 
 Let ChatGPT review your PR. This is a TypeScript fork of the https://github.com/kxxt/chatgpt-action/ action
